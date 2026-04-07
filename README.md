@@ -64,5 +64,26 @@ Para reproducir los experimentos, se requiere CMake y un compilador compatible c
 ## 7. Herramientas de IA y Trabajo Colaborativo
 * **Live Share:** Se utilizó la extensión Live Share de VS Code para el desarrollo simultáneo. Mientras un integrante estructuraba los prototipos y el `CMakeLists.txt`, el otro escribía las pruebas unitarias, agilizando el flujo de trabajo y permitiendo la revisión de código en tiempo real.
 * **Validación del uso de GitHub Copilot:**
-  * **Sugerencia Aceptada:** 
+  * **Sugerencia Aceptada:**
+    - Copilot sugirió la firma de la función y la inicialización del vector:
+      ```cpp
+      std::vector<int> answer(n, 1);
+      ```
+    - También propuso la estructura básica de los bucles `for`, lo cual fue aceptado porque sigue buenas prácticas y evita errores de índices.  
   * **Sugerencia Rechazada:**
+    - Copilot sugirió una solución usando división:
+      ```cpp
+      answer[i] = totalProduct / nums[i];
+      ```
+    - Esta sugerencia fue rechazada porque el problema prohíbe el uso de división y además falla en presencia de ceros.
+    - También se rechazó el uso de dos arreglos auxiliares ('left' y 'right') porque aumenta el uso de memoria a O(n), mientras que nuestra solución usa O(1)             auxiliar.
+* **Construcción del código:**
+  * Primero se planteó una solución ingenua O(n²), usando dos bucles anidados para multiplicar todos los elementos excepto el actual.
+  * Luego se identificó que había cálculos repetidos innecesarios.
+  * Se diseñó una solución óptima O(n) basada en:
+    - Productos prefijo (izquierda)
+    - Productos sufijo (derecha)
+  * Se implementó en dos pasadas:
+    - Primera pasada: se guardan los productos acumulados a la izquierda.
+    - Segunda pasada: se multiplica por los productos acumulados a la derecha usando una variable auxiliar `suffix`.
+  * Finalmente, se optimizó el uso de memoria evitando arreglos adicionales y manteniendo solo una variable auxiliar.
