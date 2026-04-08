@@ -48,7 +48,7 @@ Para reproducir los experimentos, se requiere CMake y un compilador compatible c
 * **Benchmark Realizado:** Comparamos el tiempo que le toma a la solución a fuerza bruta contra nuestra solución óptima usando `<chrono>`. Para que de verdad se note la diferencia asintótica, llenamos un vector con 20,000 números.
 
 **Tabla Resumida de Builds y Resultados**
-| Build | Bandera | Tiempo Naive O(n^2) | Tiempo Óptimo O(n) |
+| Build | Bandera | Tiempo Ingenuo $O(n^2)$ | Tiempo Óptimo O(n) |
 | :--- | :--- | :--- | :--- |
 | Depuración | -O0 | 1411.51 ms | 0.3976 ms |
 | Release | -O2 | 404.121 ms | 0.0724 ms |
