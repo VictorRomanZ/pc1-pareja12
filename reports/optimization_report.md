@@ -19,3 +19,71 @@ Aunque las banderas ayudan, **la mejora más abismal provino del diseño del alg
 Para garantizar la robustez de la solución, verificamos el código utilizando las herramientas AddressSanitizer (`-fsanitize=address`) y UndefinedBehaviorSanitizer (`-fsanitize=undefined`).
 
 * **Resultado:** La ejecución de los tests bajo estos sanitizers resultó completamente limpia. Esto demuestra empíricamente que nuestra implementación utilizando `std::vector` es segura en memoria: no existen *memory leaks* (fugas de memoria) y está garantizado que no se accede a índices fuera de los límites (out-of-bounds) durante los recorridos de prefijos y sufijos.
+
+## 3. Cambios Algorítmicos Realizados
+Inicialmente, se implementó una solución por fuerza bruta con complejidad O(n²), donde para cada elemento se recorría todo el arreglo para calcular el producto.
+Posteriormente, se optimizó el algoritmo usando productos prefijo y sufijo.
+
+**Estrategia**
+  - Primera pasada: calcular productos acumulados a la izquierda
+  - Segunda pasada: calcular productos a la derecha usando una variable suffix
+  // Prefijos
+  for (int i = 1; i < n; ++i) {
+      answer[i] = answer[i - 1] * nums[i - 1];
+  }
+  // Sufijos
+  int suffix = 1;
+  for (int i = n - 1; i >= 0; --i) {
+      answer[i] *= suffix;
+      suffix *= nums[i];
+  }
+
+**Impacto**
+- Complejidad reducida de O(n²) a O(n).
+- Eliminación de cálculos repetidos.
+- Mejor escalabilidad
+- Cumplimiento de la restricción (sin división)
+
+## 4. Análisis de Complejidad
+| Tipo | Valor |
+|------|------|
+| Temporal | O(n) |
+| Espacial | O(1) auxiliar |
+| Mejor caso | Θ(n) |
+| Peor caso | Θ(n) |
+| Promedio | Θ(n) |
+
+El algoritmo siempre recorre el arreglo dos veces, por lo que su comportamiento es lineal.
+
+## 5. Robustez y Casos Borde
+El algoritmo maneja correctamente:
+
+Un cero → solo una posición distinta de cero
+Múltiples ceros → todo el resultado es cero
+Números negativos → signo correcto
+n = 1 → retorna [1]
+
+Esto demuestra alta robustez ante diferentes entradas.
+
+## 6. Comparación con Solución Ingenua
+| Característica | Ingenua | Óptima |
+|--------------|--------|-------|
+| Complejidad | O(n²) | O(n) |
+| Escalabilidad | Baja | Alta |
+| Tiempo | Muy alto | Muy bajo |
+
+La diferencia crece rápidamente conforme aumenta n.
+
+## 7. Microoptimización vs Algoritmo
+Este experimento demuestra que un buen algoritmo tiene mucho más impacto que optimizar el compilador. Además, cambiar el algoritmo reduce órdenes de magnitud y el compilador solo mejora factores constantes.
+
+## 8. Conclusión Final
+La optimización principal fue algorítmica, no de compilación.
+Se logró:
+
+- Reducir complejidad de O(n²) a O(n).
+- Mantener bajo consumo de memoria.
+- Garantizar seguridad con sanitizers.
+- Validar resultados con benchmark.
+
+Esto confirma que la elección del algoritmo es el factor más importante en el rendimiento del software.
