@@ -7,7 +7,7 @@
 
 ## 1. Especificación del Problema
 * **Especificación breve:** El problema nos da un arreglo de números y nos pide devolver otro arreglo donde cada posición tenga el producto de todos los números, menos el de esa misma posición. La condición fuerte es que tiene que correr en tiempo $O(n)$ y está prohibido usar división.
-* **Entrada:** Un vector de enteros que pasamos por referencia constante`const std::vector<int>& nums` para no hacer copias innecesarias en memoria.
+* **Entrada:** Un vector de enteros que pasamos por referencia constante `const std::vector<int>& nums` para no hacer copias innecesarias en memoria.
 * **Salida:** Un vector de enteros `std::vector<int>` con los productos calculados.
 * **Tamaño de entrada relevante:** $n$, donde $n$ es la cantidad de elementos en el arreglo `nums` (hasta $10^5$). Se procesa mediante `static_cast<int>(nums.size())` para evitar advertencias de signo.
 
@@ -28,7 +28,7 @@
 * **Alternativa Ingenua o menos eficiente:** La función `productExceptSelfNaive` es nuestra versión a la fuerza bruta. Usa dos `for` anidados para multiplicar todo saltándose la posición actual. Eso nos da un tiempo cuadrático de $O(n^2)$, que es ineficiente para arreglos grandes.
 
 ## 4. Diseño e Ingeniería
-* **Robustez y Casos Borde:** El código aguanta bien los casos raros. Si hay un cero, anula todo menos su posición. Si hay varios ceros, todo el arreglo se vuelve cero automáticamente.. El uso de `static_cast<int>` garantiza robustez frente a advertencias del compilador.
+* **Robustez y Casos Borde:** El código aguanta bien los casos raros. Si hay un cero, anula todo menos su posición. Si hay varios ceros, todo el arreglo se vuelve cero automáticamente. El uso de `static_cast<int>` garantiza robustez frente a advertencias del compilador.
 * **Degeneración:** Esta solución no tiene riesgo de degenerar. Su rendimiento es constante e inamovible frente a cualquier distribución de datos (ordenados, inversos, ceros, negativos).
 * **Reutilización:** Pusimos la lógica en funciones separadas (`standalone`) dentro de un `solution.hpp`. Es mucho más limpio así y nos sirvió bastante para poder llamar a las funciones desde los tests y el benchmark sin tener que estar copiando y pegando código.
 
@@ -48,18 +48,17 @@ Para reproducir los experimentos, se requiere CMake y un compilador compatible c
 * **Benchmark Realizado:** Comparamos el tiempo que le toma a la solución a fuerza bruta contra nuestra solución óptima usando `<chrono>`. Para que de verdad se note la diferencia asintótica, llenamos un vector con 20,000 números.
 
 **Tabla Resumida de Builds y Resultados**
-| Build | Bandera | Tiempo Naive O(n^2) | Tiempo Óptimo O(n) | Tamaño Ejecutable |
-| :--- | :--- | :--- | :--- | :--- |
-| Depuración | -O0 | ~452.3 ms | ~0.15 ms | ~142 KB |
-| Depurable Opt. | -Og | ~185.1 ms | ~0.08 ms | ~118 KB |
-| Release | -O2 | ~58.4 ms | ~0.02 ms | ~76 KB |
-| Compacto | -Os | ~65.2 ms | ~0.03 ms | ~58 KB |
+| Build | Bandera | Tiempo Naive O(n^2) | Tiempo Óptimo O(n) |
+| :--- | :--- | :--- | :--- |
+| Depuración | -O0 | 1411.51 ms | 0.3976 ms |
+| Release | -O2 | 404.121 ms | 0.0724 ms |
+| Compacto | -Os | 421.871 ms | 0.1332 ms |
 
-* **Observaciones de Compilación:** Con la bandera -O2, la versión mala mejoró bastante su tiempo, pero aún así, nuestra versión óptima incluso en -O0 (sin optimizar nada) es superior. La bandera -Os hizo que el ejecutable pese un poco menos, como esperábamos.
-* **Sanitizers:** Al correr el programa con `-fsanitize=address,undefined`, no hubo errores de compilación (Exit Code 0). Cero fugas de memoria y no nos salimos de los límites del vector.
-* **Cobertura (Coverage):** Usamos `--coverage` y confirmamos que nuestros tests pasan por el 100% de las líneas de nuestro algoritmo. No dejamos código inalcanzable.
-* **Profiling:** Con `gprof` vimos empíricamente que el programa se pasa casi el 99% del tiempo ejecutando la función ingenua. Esto es porque $O(n^2)$ pesa muchísimo más que O(n) cuando la entrada es grande.
-* **Microoptimización vs Algoritmo:** Este experimento demuestra que pensar en un buen algoritmo es mejor que solo ponerle `-O3` al compilador para intentar arreglar un código lento.
+* **Observaciones de Compilación:** Con la bandera -O2, la versión ingenua mejoró muchísimo su tiempo (bajó de 1411 ms a 404 ms por optimizaciones internas del compilador), pero aún así, nuestra versión óptima incluso en -O0 (sin optimizar nada, 0.39 ms) es inmensamente superior. La bandera -Os priorizó reducir el peso del archivo, por lo que fue ligeramente más lenta que -O2.
+* **Sanitizers:** Al verificar el programa con -fsanitize=address,undefined, no hubo alertas ni errores de memoria. Confirmamos que no hay fugas (memory leaks) y no nos salimos de los límites del vector.
+* **Cobertura (Coverage):** Usamos la herramienta gcov y confirmamos que nuestros tests evalúan el 100% de las líneas y ramas de nuestro algoritmo. No quedó código muerto sin probar.
+* **Profiling:** Con gprof vimos empíricamente que el programa se pasa casi el 99.9% del tiempo ejecutando la función ingenua. Esto es porque $O(n^2)$ pesa muchísimo más que $O(n)$ cuando la entrada es grande.
+* **Microoptimización vs Algoritmo:** Este experimento demuestra empíricamente que pensar en un buen diseño asintótico ($O(n)$) es infinitamente mejor que solo pedirle al compilador que arregle un mal código ($O(n^2)$).
 
 ## 7. Herramientas de IA y Trabajo Colaborativo
 * **Live Share:** Se utilizó la extensión Live Share de VS Code para el desarrollo simultáneo. Mientras un integrante estructuraba los prototipos y el `CMakeLists.txt`, el otro escribía las pruebas unitarias, agilizando el flujo de trabajo y permitiendo la revisión de código en tiempo real.
@@ -87,3 +86,4 @@ Para reproducir los experimentos, se requiere CMake y un compilador compatible c
     - Primera pasada: se guardan los productos acumulados a la izquierda.
     - Segunda pasada: se multiplica por los productos acumulados a la derecha usando una variable auxiliar `suffix`.
   * Finalmente, se optimizó el uso de memoria evitando arreglos adicionales y manteniendo solo una variable auxiliar.
+
